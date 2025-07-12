@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>隨機密碼產生器</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f7f8fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 1em;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 1em;
+      font-size: 1.5em;
+    }
+
+    label {
+      display: block;
+      margin: 0.5em 0;
+      text-align: left;
+      font-size: 1em;
+    }
+
+    input[type="number"] {
+      width: 70px;
+      margin-left: 0.5em;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 0.5em;
+    }
+
+    .result {
+      margin-top: 1em;
+      padding: 0.8em;
+      background: #f1f1f1;
+      border-radius: 6px;
+      font-size: 1.2em;
+      word-break: break-word;
+      user-select: all;
+    }
+
+    button {
+      margin: 0.5em 0.2em;
+      padding: 0.6em 1.2em;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+      max-width: 160px;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.5em;
+      }
+
+      h2 {
+        font-size: 1.3em;
+      }
+
+      button {
+        font-size: 1em;
+        padding: 0.5em;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔐 隨機密碼產生器</h2>
+
+    <label>
+      密碼長度：
+      <input type="number" id="length" value="12" min="4" max="50">
+    </label>
+
+    <label><input type="checkbox" id="uppercase" checked> 包含大寫字母</label>
+    <label><input type="checkbox" id="lowercase" checked> 包含小寫字母</label>
+    <label><input type="checkbox" id="numbers" checked> 包含數字</label>
+    <label><input type="checkbox" id="symbols"> 包含符號（!@#$%^&）</label>
+
+    <button onclick="generatePassword()">🎲 產生密碼</button>
+
+    <div class="result" id="result">請先產生密碼</div>
+
+    <button onclick="copyPassword()">📋 複製</button>
+    <button onclick="downloadPassword()">📄 下載</button>
+  </div>
+
+  <script>
+    function generatePassword() {
+      const length = parseInt(document.getElementById("length").value);
+      const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const lower = "abcdefghijklmnopqrstuvwxyz";
+      const numbers = "0123456789";
+      const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?/";
+
+      let charSet = "";
+      if (document.getElementById("uppercase").checked) charSet += upper;
+      if (document.getElementById("lowercase").checked) charSet += lower;
+      if (document.getElementById("numbers").checked) charSet += numbers;
+      if (document.getElementById("symbols").checked) charSet += symbols;
+
+      if (!charSet) {
+        alert("請至少選擇一種字元類型！");
+        return;
+      }
+
+      let password = "";
+      for (let i = 0; i < length; i++) {
+        const randIndex = Math.floor(Math.random() * charSet.length);
+        password += charSet[randIndex];
+      }
+
+      document.getElementById("result").textContent = password;
+    }
+
+    function copyPassword() {
+      const password = document.getElementById("result").textContent;
+      if (!password || password === "請先產生密碼") {
+        alert("請先產生密碼！");
+        return;
+      }
+
+      navigator.clipboard.writeText(password)
+        .then(() => alert("✅ 密碼已複製！"))
+        .catch(() => alert("❌ 複製失敗"));
+    }
+
+    function downloadPassword() {
+      const password = document.getElementById("result").textContent;
+      if (!password || password === "請先產生密碼") {
+        alert("請先產生密碼！");
+        return;
+      }
+
+      const blob = new Blob([password], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "random-password.txt";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
